@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocationsModule } from './v1/locations/locations.module';
 import { ExperiencesModule } from './v1/experiences/experiences.module';
+import { TrailsModule } from './v1/trails/trails.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ExperiencesModule } from './v1/experiences/experiences.module';
     }),
     LocationsModule,
     ExperiencesModule,
+    TrailsModule,
     /*TypeOrmModule.forRoot(configTypeorm)*/
   ],
   providers: [

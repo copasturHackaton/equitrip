@@ -44,7 +44,7 @@ export class LocationsService {
   }
 
   async findOne(id: string) {
-    const foundLocation = await this.locationModel.findOne({ _id: id });
+    const foundLocation = await this.locationModel.findById(id);
 
     // TODO: create custom error to return the right status code and message
     if (!foundLocation) {

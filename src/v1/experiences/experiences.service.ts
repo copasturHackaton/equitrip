@@ -58,7 +58,7 @@ export class ExperiencesService {
   }
 
   async findOne(id: string) {
-    const foundExperience = await this.experienceModel.findOne({ _id: id });
+    const foundExperience = await this.experienceModel.findById(id);
 
     // TODO: create custom error to return the right status code and message
     if (!foundExperience) {
