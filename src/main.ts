@@ -25,7 +25,7 @@ function swaggerConfig() {
 
 async function bootstrap() {
   http.get({ host: 'api.ipify.org', port: 80, path: '/' });
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, { cors: false });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -33,14 +33,14 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.setGlobalPrefix('api/copastur');
+
+  app.setGlobalPrefix('v1/api/copastur');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   const document = SwaggerModule.createDocument(app, swaggerConfig());
-  SwaggerModule.setup('api/docs', app, document);
-  console.log();
+  SwaggerModule.setup('v1/api/docs', app, document);
 
-  await app.listen(process.env.PORT || 3333);
+  await app.listen(process.env.SERVER_PORT);
 }
 
 bootstrap();
