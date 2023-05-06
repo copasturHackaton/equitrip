@@ -1,15 +1,16 @@
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
-import { config } from '../config';
+import * as path from 'path';
 
 export const configTypeorm = {
-  type: config.db.type,
-  url: config.db.url,
-  entities: config.db.entities,
-  migrations: config.db.migrations,
+  type: 'mysql',
+  url: process.env.DB_URL,
+  entities: [path.resolve(__dirname, 'database', 'models', '*')],
+  migrations: [path.resolve(__dirname, 'database', 'migrations', '*')],
   cli: {
-    migrationsDir: config.db.cli.migrationsDir,
-    entitiesDir: config.db.cli.entitiesDir,
+    migrationsDir: path.resolve(__dirname, 'database', 'migrations'),
+    entitiesDir: path.resolve(__dirname, 'database', 'models'),
   },
-  synchronize: config.db.synchronize,
-  logging: config.db.logging,
+  autoSchemaSync: true,
+  synchronize: true,
+  logging: true,
 } as TypeOrmModuleAsyncOptions;
