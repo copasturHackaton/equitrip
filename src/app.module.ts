@@ -3,6 +3,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocationsModule } from './v1/locations/locations.module';
+import { ExperiencesModule } from './v1/experiences/experiences.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LocationsModule } from './v1/locations/locations.module';
       inject: [ConfigService],
     }),
     LocationsModule,
+    ExperiencesModule,
     /*TypeOrmModule.forRoot(configTypeorm)*/
   ],
   providers: [

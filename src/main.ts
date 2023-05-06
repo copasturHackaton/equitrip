@@ -34,11 +34,11 @@ async function bootstrap() {
     }),
   );
 
-  app.setGlobalPrefix('v1/api/copastur');
+  app.setGlobalPrefix('/api/v1/copastur');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   const document = SwaggerModule.createDocument(app, swaggerConfig());
-  SwaggerModule.setup('v1/api/docs', app, document);
+  SwaggerModule.setup('/api/v1/docs', app, document);
 
   await app.listen(process.env.SERVER_PORT);
 }

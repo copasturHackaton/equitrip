@@ -1,4 +1,4 @@
-export enum targetAudience {
+export enum targetAudiences {
   USER = 'USER',
   ADMIN = 'ADMIN',
   BLOGGER = 'BLOGGER',

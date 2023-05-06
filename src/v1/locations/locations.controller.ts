@@ -7,14 +7,11 @@ import {
   Param,
   Delete,
   Query,
-  DefaultValuePipe,
-  ParseIntPipe,
-  ValidationPipe,
 } from '@nestjs/common';
 import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { PaginationParams } from './dto/pagination-params.dto';
+import { PaginationParams } from '../shared/dto/pagination-params.dto';
 
 @Controller('locations')
 export class LocationsController {

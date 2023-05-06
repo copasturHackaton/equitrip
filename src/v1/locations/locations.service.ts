@@ -1,11 +1,12 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+
+import { Location } from '../database/models/location.entity';
+import { sortOptions } from 'utils/enums';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Location } from '../database/models/location.entity';
-import { Model } from 'mongoose';
-import { sortOptions } from 'utils/enums';
-import { FindAllResponseDto } from './dto/find-all-response.dto';
+import { FindAllLocationsResponseDto } from './dto/find-all-locations-response.dto';
 
 @Injectable()
 export class LocationsService {
@@ -26,7 +27,7 @@ export class LocationsService {
     offset = 0,
     limit = 10,
     sort?: sortOptions,
-  ): Promise<FindAllResponseDto> {
+  ): Promise<FindAllLocationsResponseDto> {
     const locationsQuery = this.locationModel.find().skip(offset).limit(limit);
 
     if (sort) {
