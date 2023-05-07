@@ -6,6 +6,7 @@ import { LocationsModule } from './v1/locations/locations.module';
 import { ExperiencesModule } from './v1/experiences/experiences.module';
 import { TrailsModule } from './v1/trails/trails.module';
 import { UserModule } from './v1/users/users.module';
+import { HealthcheckModule } from './v1/healthcheck/healthcheck.module';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { UserModule } from './v1/users/users.module';
     ExperiencesModule,
     TrailsModule,
     UserModule,
-    /*TypeOrmModule.forRoot(configTypeorm)*/
+    HealthcheckModule,
   ],
   providers: [
     {
