@@ -9,56 +9,47 @@ import {
   Delete,
   Query,
   Res,
+  HttpException,
 } from '@nestjs/common';
 
 import { TrailsService } from './trails.service';
 import { CreateTrailDto } from './dto/create-trail.dto';
 import { UpdateTrailDto } from './dto/update-trail.dto';
 import { PaginationParams } from '../shared/dto/pagination-params.dto';
-import { BaseError } from '../shared/errors/BaseError';
 
 @Controller('trails')
 export class TrailsController {
   constructor(private readonly trailsService: TrailsService) {}
 
   @Post()
-  async create(
-    @Body() createTrailDto: CreateTrailDto,
-    @Res() response: Response,
-  ) {
+  async create(@Body() createTrailDto: CreateTrailDto) {
     try {
       const { _id } = await this.trailsService.create(createTrailDto);
+
       return { _id };
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
   @Get()
-  async findAll(
-    @Query() { offset, limit, sort }: PaginationParams,
-    @Res() response: Response,
-  ) {
+  async findAll(@Query() { offset, limit, sort }: PaginationParams) {
     try {
       return await this.trailsService.findAll(offset, limit, sort);
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
@@ -69,13 +60,11 @@ export class TrailsController {
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 

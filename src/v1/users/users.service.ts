@@ -1,11 +1,14 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+
 import { User } from '../database/models/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { NotFoundError } from '../shared/errors/NotFoundError';
-import { ForbiddenError } from '../shared/errors/ForbiddenError';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +31,7 @@ export class UsersService {
     const foundUser = await this.userModel.findById(id);
 
     if (!foundUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return foundUser.toObject();
@@ -38,7 +41,7 @@ export class UsersService {
     const foundEmail = await this.userModel.findOne({ email }, { password: 1 });
 
     if (!foundEmail) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return foundEmail.toObject();
@@ -50,7 +53,7 @@ export class UsersService {
 
   async remove(loggedInUserId: string, id: string) {
     if (loggedInUserId !== id) {
-      throw new ForbiddenError('You are not allowed to do that');
+      throw new ForbiddenException('You are not allowed to do that');
     }
 
     await this.userModel.deleteOne({ _id: id });

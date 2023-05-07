@@ -14,9 +14,11 @@ import { HealthcheckModule } from './v1/healthcheck/healthcheck.module';
     // TODO: (maybe) refactor to get this info from database file
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-      }),
+      useFactory: async function (configService: ConfigService) {
+        return {
+          uri: configService.get<string>('MONGODB_URI'),
+        };
+      },
       inject: [ConfigService],
     }),
     LocationsModule,

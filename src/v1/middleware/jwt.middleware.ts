@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import { UnauthorizedError } from '../shared/errors/UnauthorizedError';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
@@ -13,7 +15,7 @@ export class JwtMiddleware implements NestMiddleware {
     const token = req.cookies.token;
 
     if (!token) {
-      throw new UnauthorizedError('No credentials provided');
+      throw new UnauthorizedException('No credentials provided');
     }
 
     try {
@@ -22,7 +24,7 @@ export class JwtMiddleware implements NestMiddleware {
 
       req['userId'] = decoded.userId;
     } catch (error) {
-      throw new UnauthorizedError('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     next();

@@ -1,8 +1,7 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { NotFoundError } from '../shared/errors/NotFoundError';
 import { Experience } from '../database/models/experience.entity';
 import { Trail } from '../database/models/trail.entity';
 import { sortOptions } from 'utils/enums';
@@ -27,7 +26,7 @@ export class TrailsService {
         .exec();
 
       if (experiencesExist.length !== createTrailDto.getExperiences().length) {
-        throw new NotFoundError('Some location was not found');
+        throw new NotFoundException('Some location was not found');
       }
 
       const createdLocation = new this.trailModel(createTrailDto);
@@ -81,7 +80,7 @@ export class TrailsService {
     });
 
     if (!foundTrail) {
-      throw new NotFoundError('Trail not found');
+      throw new NotFoundException('Trail not found');
     }
 
     return foundTrail.toObject();

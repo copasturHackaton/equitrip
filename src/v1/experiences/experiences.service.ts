@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Location } from '../database/models/location.entity';
@@ -8,7 +8,6 @@ import { sortOptions } from 'utils/enums';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { FindAllExperiencesResponseDto } from './dto/find-all-experiences-response.dto';
-import { NotFoundError } from '../shared/errors/NotFoundError';
 
 @Injectable()
 export class ExperiencesService {
@@ -23,7 +22,7 @@ export class ExperiencesService {
     });
 
     if (!locationExists) {
-      throw new NotFoundError('Location not found');
+      throw new NotFoundException('Location not found');
     }
 
     const createdLocation = new this.experienceModel(createExperienceDto);
@@ -60,7 +59,7 @@ export class ExperiencesService {
       .populate('location');
 
     if (!foundExperience) {
-      throw new NotFoundError('Experience not found');
+      throw new NotFoundException('Experience not found');
     }
 
     return foundExperience.toObject();

@@ -19,7 +19,7 @@ import { JwtMiddleware } from '../middleware/jwt.middleware';
       {
         name: User.name,
         // TODO: refactor to another function
-        useFactory: async () => {
+        useFactory: async function () {
           const schema = UserSchema;
 
           schema.pre('save', async function () {

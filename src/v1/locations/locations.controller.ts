@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import {
   Controller,
   Get,
@@ -8,74 +7,62 @@ import {
   Param,
   Delete,
   Query,
-  Res,
+  HttpException,
 } from '@nestjs/common';
 
 import { LocationsService } from './locations.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { PaginationParams } from '../shared/dto/pagination-params.dto';
-import { BaseError } from '../shared/errors/BaseError';
 
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
 
   @Post()
-  async create(
-    @Body() createLocationDto: CreateLocationDto,
-    @Res() response: Response,
-  ) {
+  async create(@Body() createLocationDto: CreateLocationDto) {
     try {
       const { _id } = await this.locationsService.create(createLocationDto);
+
       return { _id };
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
   @Get()
-  async findAll(
-    @Query() { offset, limit, sort }: PaginationParams,
-    @Res() response: Response,
-  ) {
+  async findAll(@Query() { offset, limit, sort }: PaginationParams) {
     try {
       return await this.locationsService.findAll(offset, limit, sort);
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() response: Response) {
+  async findOne(@Param('id') id: string) {
     try {
       return await this.locationsService.findOne(id);
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 

@@ -10,6 +10,9 @@ import {
   Req,
   Res,
   HttpStatus,
+  HttpException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
@@ -20,9 +23,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
-import { NotFoundError } from '../shared/errors/NotFoundError';
-import { UnauthorizedError } from '../shared/errors/UnauthorizedError';
-import { BaseError } from '../shared/errors/BaseError';
 
 @Controller('users')
 export class UsersController {
@@ -33,23 +33,18 @@ export class UsersController {
   ) {}
 
   @Post()
-  async create(
-    @Body() createUserDto: CreateUserDto,
-    @Res() response: Response,
-  ) {
+  async create(@Body() createUserDto: CreateUserDto) {
     try {
       const { _id } = await this.usersService.create(createUserDto);
+
       return { _id };
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
-
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
@@ -59,19 +54,17 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() response: Response) {
+  async findOne(@Param('id') id: string) {
     try {
       return await this.usersService.findOne(id);
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
@@ -90,17 +83,15 @@ export class UsersController {
       const { userId: loggedInUserId } = request;
       await this.usersService.remove(loggedInUserId, id);
 
-      return response.status(HttpStatus.NO_CONTENT).send();
+      response.status(HttpStatus.NO_CONTENT);
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 
@@ -114,7 +105,7 @@ export class UsersController {
       const user = await this.usersService.findByEmail(loginUserDto.getEmail());
 
       if (!user) {
-        throw new NotFoundError('User not found');
+        throw new NotFoundException('User not found');
       }
 
       const passwordsMatch = await this.authService.comparePasswords(
@@ -123,7 +114,7 @@ export class UsersController {
       );
 
       if (!passwordsMatch) {
-        throw new UnauthorizedError('Invalid credentials');
+        throw new UnauthorizedException('Invalid credentials');
       }
 
       const jwtSecretKey = this.configService.get<string>('JWT_SECRET_KEY');
@@ -157,13 +148,11 @@ export class UsersController {
     } catch (error) {
       const { status, message } = error;
 
-      if (error instanceof BaseError) {
-        return response.status(status).send(error);
+      if (error instanceof HttpException) {
+        throw error;
       }
 
-      const builtError = new BaseError(message, status, error);
-
-      return response.status(builtError.getStatus()).send(builtError);
+      throw new HttpException(message, status, { cause: error });
     }
   }
 }

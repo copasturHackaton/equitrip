@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Location } from '../database/models/location.entity';
@@ -7,7 +7,6 @@ import { sortOptions } from 'utils/enums';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { FindAllLocationsResponseDto } from './dto/find-all-locations-response.dto';
-import { NotFoundError } from '../shared/errors/NotFoundError';
 
 @Injectable()
 export class LocationsService {
@@ -48,7 +47,7 @@ export class LocationsService {
     const foundLocation = await this.locationModel.findById(id);
 
     if (!foundLocation) {
-      throw new NotFoundError('Location not found');
+      throw new NotFoundException('Location not found');
     }
 
     return foundLocation.toObject();
