@@ -8,7 +8,10 @@ import {
   HttpException,
   Req,
   NotFoundException,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 
 import { TrailsService } from './trails.service';
 import { CreateTrailDto } from './dto/create-trail.dto';
@@ -16,6 +19,7 @@ import { PaginationParams } from '../shared/dto/pagination-params.dto';
 import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
 import { UserVoteTrailDto } from '../users/dto/user-vote-trail.dto';
 import { enums } from 'utils';
+import { response } from 'express';
 
 @Controller()
 export class TrailsController {
@@ -78,6 +82,7 @@ export class TrailsController {
   async voteTrail(
     @Body() userVoteTrailDto: UserVoteTrailDto,
     @Req() request: LoggedInRequest,
+    @Res() response: Response,
   ) {
     try {
       // TODO: refactor business logic out of controller layer
@@ -106,14 +111,9 @@ export class TrailsController {
         },
       } as any;
 
-      const trailUpdated = await this.trailsService.update(
-        trailFound._id,
-        update,
-      );
+      await this.trailsService.update(trailFound._id, update);
 
-      return {
-        trailUpdated,
-      };
+      response.status(HttpStatus.NO_CONTENT);
     } catch (error) {
       const { status, message } = error;
 
