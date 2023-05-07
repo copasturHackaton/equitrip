@@ -50,6 +50,7 @@ export class UsersService {
 
   async remove(loggedInUserId: string, id: string) {
     if (loggedInUserId !== id) {
+      // TODO: create custom error to return the right status code and message
       throw new Error('Unauthorized');
     }
 

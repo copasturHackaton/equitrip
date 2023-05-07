@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
@@ -50,9 +51,15 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Req() req: LoggedInRequest, @Param('id') id: string) {
+  async remove(
+    @Param('id') id: string,
+    @Req() req: LoggedInRequest,
+    @Res() res: Response,
+  ) {
     const { userId: loggedInUserId } = req;
-    return await this.usersService.remove(loggedInUserId, id);
+    await this.usersService.remove(loggedInUserId, id);
+
+    return res.status(HttpStatus.NO_CONTENT).send();
   }
 
   @Post('login')
