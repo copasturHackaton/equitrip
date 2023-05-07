@@ -33,9 +33,9 @@ async function bootstrap() {
 
   if (env === 'production') {
     app.enableCors({
-      allowedHeaders: ['content-type'],
+      allowedHeaders: ['Content-Type', 'Accept'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      origin,
+      origin: [origin, origin.replace('www', '')],
       credentials: true,
     });
   } else {
