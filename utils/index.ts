@@ -1,3 +1,4 @@
 import * as enums from './enums';
+import * as date from './date';
 
-export { enums };
+export { date, enums };

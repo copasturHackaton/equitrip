@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocationsModule } from './v1/locations/locations.module';
 import { ExperiencesModule } from './v1/experiences/experiences.module';
 import { TrailsModule } from './v1/trails/trails.module';
+import { UserModule } from './v1/users/users.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TrailsModule } from './v1/trails/trails.module';
     LocationsModule,
     ExperiencesModule,
     TrailsModule,
+    UserModule,
     /*TypeOrmModule.forRoot(configTypeorm)*/
   ],
   providers: [

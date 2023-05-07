@@ -21,3 +21,17 @@ export enum sortOptions {
   ascending = 1,
   descending = -1,
 }
+
+export enum genders {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  GENDERLESS = 'GENDERLESS',
+}
+
+export enum races {
+  BRANCA = 'BRANCA',
+  PRETA = 'PRETA',
+  PARDA = 'PARDA',
+  INDIGENA = 'INDÍGENA',
+  AMARELA = 'AMARELA',
+}
