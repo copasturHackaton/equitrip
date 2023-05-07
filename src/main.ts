@@ -1,6 +1,5 @@
 import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
-import * as http from 'http';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -25,7 +24,6 @@ function swaggerConfig() {
 }
 
 async function bootstrap() {
-  http.get({ host: 'api.ipify.org', port: 80, path: '/' });
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(
     new ValidationPipe({

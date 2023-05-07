@@ -10,21 +10,29 @@ import {
   Query,
   Res,
   HttpException,
+  Req,
 } from '@nestjs/common';
 
 import { TrailsService } from './trails.service';
 import { CreateTrailDto } from './dto/create-trail.dto';
 import { UpdateTrailDto } from './dto/update-trail.dto';
 import { PaginationParams } from '../shared/dto/pagination-params.dto';
+import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
 
 @Controller('trails')
 export class TrailsController {
   constructor(private readonly trailsService: TrailsService) {}
 
   @Post()
-  async create(@Body() createTrailDto: CreateTrailDto) {
+  async create(
+    @Body() createTrailDto: CreateTrailDto,
+    @Req() request: LoggedInRequest,
+  ) {
     try {
-      const { _id } = await this.trailsService.create(createTrailDto);
+      const { _id } = await this.trailsService.create(
+        createTrailDto,
+        request.userId,
+      );
 
       return { _id };
     } catch (error) {

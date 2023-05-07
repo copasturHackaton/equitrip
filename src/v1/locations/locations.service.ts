@@ -14,9 +14,15 @@ export class LocationsService {
     @InjectModel(Location.name) private locationModel: Model<Location>,
   ) {}
 
-  async create(createLocationDto: CreateLocationDto): Promise<Location> {
+  async create(
+    createLocationDto: CreateLocationDto,
+    authorId: string,
+  ): Promise<Location> {
     try {
-      const createdLocation = new this.locationModel(createLocationDto);
+      const createdLocation = new this.locationModel({
+        ...createLocationDto,
+        authorId,
+      });
       return (await createdLocation.save()).toObject();
     } catch (error) {
       console.error(error);

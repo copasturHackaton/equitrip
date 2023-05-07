@@ -16,7 +16,10 @@ export class TrailsService {
     @InjectModel(Trail.name) private trailModel: Model<Trail>,
   ) {}
 
-  async create(createTrailDto: CreateTrailDto): Promise<Experience> {
+  async create(
+    createTrailDto: CreateTrailDto,
+    authorId: string,
+  ): Promise<Experience> {
     try {
       const experiencesExist = await this.experienceModel
         .find({
@@ -29,7 +32,10 @@ export class TrailsService {
         throw new NotFoundException('Some location was not found');
       }
 
-      const createdLocation = new this.trailModel(createTrailDto);
+      const createdLocation = new this.trailModel({
+        ...createTrailDto,
+        authorId,
+      });
       return (await createdLocation.save()).toObject();
     } catch (error) {
       console.error(error);

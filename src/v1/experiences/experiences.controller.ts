@@ -8,21 +8,29 @@ import {
   Delete,
   Query,
   HttpException,
+  Req,
 } from '@nestjs/common';
 
 import { ExperiencesService } from './experiences.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { PaginationParams } from '../shared/dto/pagination-params.dto';
+import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
 
 @Controller('experiences')
 export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
   @Post()
-  async create(@Body() createExperienceDto: CreateExperienceDto) {
+  async create(
+    @Body() createExperienceDto: CreateExperienceDto,
+    @Req() request: LoggedInRequest,
+  ) {
     try {
-      const { _id } = await this.experiencesService.create(createExperienceDto);
+      const { _id } = await this.experiencesService.create(
+        createExperienceDto,
+        request.userId,
+      );
 
       return { _id };
     } catch (error) {

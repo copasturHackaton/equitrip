@@ -16,7 +16,10 @@ export class ExperiencesService {
     @InjectModel(Experience.name) private experienceModel: Model<Experience>,
   ) {}
 
-  async create(createExperienceDto: CreateExperienceDto): Promise<Experience> {
+  async create(
+    createExperienceDto: CreateExperienceDto,
+    authorId: string,
+  ): Promise<Experience> {
     const locationExists = await this.locationModel.findOne({
       _id: createExperienceDto.getLocation(),
     });
@@ -25,7 +28,10 @@ export class ExperiencesService {
       throw new NotFoundException('Location not found');
     }
 
-    const createdLocation = new this.experienceModel(createExperienceDto);
+    const createdLocation = new this.experienceModel({
+      ...createExperienceDto,
+      authorId,
+    });
     return (await createdLocation.save()).toObject();
   }
 
