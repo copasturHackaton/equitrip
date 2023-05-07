@@ -20,15 +20,13 @@ export class TrailsService {
     try {
       const experiencesExist = await this.experienceModel
         .find({
-          $or: createTrailDto
-            .getExperiences()
-            .map((experience) => ({ _id: experience.experienceId })),
+          $or: createTrailDto.getExperiences().map((_id) => ({ _id })),
         })
         .lean()
         .exec();
 
       // TODO: create custom error to return the right status code and message
-      if (!experiencesExist.length) {
+      if (experiencesExist.length !== createTrailDto.getExperiences().length) {
         throw new Error('Location not found');
       }
 
@@ -44,23 +42,43 @@ export class TrailsService {
     limit = 10,
     sort?: sortOptions,
   ): Promise<FindAllTrailsResponseDto> {
-    const trailsQuery = this.trailModel.find().skip(offset).limit(limit);
+    try {
+      const trailsQuery = this.trailModel
+        .find()
+        .populate({
+          path: 'experiences',
+          populate: {
+            path: 'location',
+            model: 'Location',
+          },
+        })
+        .skip(offset)
+        .limit(limit);
 
-    if (sort) {
-      trailsQuery.sort({ updatedAt: sort });
+      if (sort) {
+        trailsQuery.sort({ updatedAt: sort });
+      }
+
+      const trails = await trailsQuery.lean().exec();
+      const count = await this.trailModel.countDocuments();
+
+      return {
+        count,
+        trails,
+      };
+    } catch (error) {
+      console.error(error);
     }
-
-    const trails = await trailsQuery.lean().exec();
-    const count = await this.trailModel.countDocuments();
-
-    return {
-      count,
-      trails,
-    };
   }
 
   async findOne(id: string) {
-    const foundTrail = await this.trailModel.findById(id);
+    const foundTrail = await this.trailModel.findById(id).populate({
+      path: 'experiences',
+      populate: {
+        path: 'location',
+        model: 'Location',
+      },
+    });
 
     // TODO: create custom error to return the right status code and message
     if (!foundTrail) {

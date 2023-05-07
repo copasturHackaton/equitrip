@@ -19,7 +19,7 @@ export class ExperiencesService {
   async create(createExperienceDto: CreateExperienceDto): Promise<Experience> {
     try {
       const locationExists = await this.locationModel.findOne({
-        _id: createExperienceDto.getLocationId(),
+        _id: createExperienceDto.getLocation(),
       });
 
       // TODO: create custom error to return the right status code and message
@@ -41,6 +41,7 @@ export class ExperiencesService {
   ): Promise<FindAllExperiencesResponseDto> {
     const experiencesQuery = this.experienceModel
       .find()
+      .populate('location')
       .skip(offset)
       .limit(limit);
 
@@ -58,7 +59,9 @@ export class ExperiencesService {
   }
 
   async findOne(id: string) {
-    const foundExperience = await this.experienceModel.findById(id);
+    const foundExperience = await this.experienceModel
+      .findById(id)
+      .populate('location');
 
     // TODO: create custom error to return the right status code and message
     if (!foundExperience) {

@@ -20,7 +20,7 @@ export class CreateExperienceDto {
 
   @IsNotEmpty()
   @IsUUID()
-  private readonly locationId: string;
+  private readonly location: string;
 
   @IsNotEmpty()
   @IsString()
@@ -47,7 +47,7 @@ export class CreateExperienceDto {
   @IsString({ each: true })
   private readonly imagesLinks: string;
 
-  public getLocationId(): string {
-    return this.locationId;
+  public getLocation(): string {
+    return this.location;
   }
 }

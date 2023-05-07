@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
   IsArray,
   IsNotEmpty,
@@ -6,7 +5,6 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { Experience } from 'src/v1/shared/dto/experience-priorization.dto';
 
 export class CreateTrailDto {
   @IsNotEmpty()
@@ -15,8 +13,7 @@ export class CreateTrailDto {
 
   @IsNotEmpty()
   @IsArray()
-  @Type(() => Experience)
-  private readonly experiences: Array<Experience>;
+  private readonly experiences: Array<string>;
 
   @IsNotEmpty()
   @IsString()
@@ -28,7 +25,7 @@ export class CreateTrailDto {
   @IsString({ each: true })
   private readonly imagesLinks: string;
 
-  public getExperiences(): Array<Experience> {
+  public getExperiences(): Array<string> {
     return this.experiences;
   }
 }

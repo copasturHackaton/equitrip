@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Experience } from 'src/v1/shared/dto/experience-priorization.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { Experience } from './experience.entity';
 
 @Schema()
 export class Trail {
@@ -17,11 +17,11 @@ export class Trail {
   authorId: string;
 
   @Prop({
-    type: Array<Experience>,
     required: true,
     maxlength: 100,
+    ref: 'Experience',
   })
-  experiences: Array<Experience>;
+  experiences: Experience[];
 
   @Prop({
     type: String,

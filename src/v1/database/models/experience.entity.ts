@@ -19,8 +19,9 @@ export class Experience {
   @Prop({
     type: String,
     required: true,
+    ref: 'Location',
   })
-  locationId: string;
+  location: string;
 
   @Prop({
     type: String,
