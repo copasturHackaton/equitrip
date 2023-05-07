@@ -35,3 +35,15 @@ export enum races {
   INDIGENA = 'INDÍGENA',
   AMARELA = 'AMARELA',
 }
+
+export enum voteActions {
+  UPVOTE = 'UPVOTE',
+  DOWNVOTE = 'DOWNVOTE',
+}
+
+export enum disabilities {
+  PHYSICAL = 'PHYSICAL',
+  VISUAL = 'VISUAL',
+  AUDITORY = 'AUDITORY',
+  INTELLECTUAL = 'INTELLECTUAL',
+}

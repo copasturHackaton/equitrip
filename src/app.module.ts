@@ -11,7 +11,6 @@ import { HealthcheckModule } from './v1/healthcheck/healthcheck.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // TODO: (maybe) refactor to get this info from database file
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async function (configService: ConfigService) {

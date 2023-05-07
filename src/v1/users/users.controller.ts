@@ -122,6 +122,9 @@ export class UsersController {
       const token = jwt.sign(
         {
           userId: user._id,
+          gender: user.gender,
+          race: user.race,
+          disabiltiies: user.disabilities?.join(),
         },
         jwtSecretKey,
         { expiresIn: jwtExpiresIn },

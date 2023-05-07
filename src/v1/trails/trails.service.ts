@@ -18,7 +18,7 @@ export class TrailsService {
 
   async create(
     createTrailDto: CreateTrailDto,
-    authorId: string,
+    author: string,
   ): Promise<Experience> {
     try {
       const experiencesExist = await this.experienceModel
@@ -34,7 +34,7 @@ export class TrailsService {
 
       const createdLocation = new this.trailModel({
         ...createTrailDto,
-        authorId,
+        author,
       });
       return (await createdLocation.save()).toObject();
     } catch (error) {
@@ -57,6 +57,7 @@ export class TrailsService {
             model: 'Location',
           },
         })
+        .populate('author')
         .skip(offset)
         .limit(limit);
 
@@ -92,7 +93,8 @@ export class TrailsService {
     return foundTrail.toObject();
   }
 
-  update(id: number, updateTrailDto: UpdateTrailDto) {
+  async update(id: string, updateTrailDto: UpdateTrailDto) {
+    await this.trailModel.updateOne({ _id: id }, updateTrailDto, { new: true });
     return `This action updates a #${id} trail`;
   }
 

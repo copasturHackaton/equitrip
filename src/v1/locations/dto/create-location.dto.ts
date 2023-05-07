@@ -14,10 +14,6 @@ import { enums } from 'utils';
 
 export class CreateLocationDto {
   @IsNotEmpty()
-  @IsUUID()
-  private readonly authorId: string;
-
-  @IsNotEmpty()
   @IsString()
   @MaxLength(100)
   private readonly name: string;

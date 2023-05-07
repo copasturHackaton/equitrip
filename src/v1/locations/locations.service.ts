@@ -16,12 +16,12 @@ export class LocationsService {
 
   async create(
     createLocationDto: CreateLocationDto,
-    authorId: string,
+    author: string,
   ): Promise<Location> {
     try {
       const createdLocation = new this.locationModel({
         ...createLocationDto,
-        authorId,
+        author,
       });
       return (await createdLocation.save()).toObject();
     } catch (error) {

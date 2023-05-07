@@ -16,10 +16,6 @@ import { enums } from 'utils';
 export class CreateExperienceDto {
   @IsNotEmpty()
   @IsUUID()
-  private readonly authorId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
   private readonly location: string;
 
   @IsNotEmpty()

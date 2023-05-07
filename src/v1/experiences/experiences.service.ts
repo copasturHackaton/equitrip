@@ -18,7 +18,7 @@ export class ExperiencesService {
 
   async create(
     createExperienceDto: CreateExperienceDto,
-    authorId: string,
+    author: string,
   ): Promise<Experience> {
     const locationExists = await this.locationModel.findOne({
       _id: createExperienceDto.getLocation(),
@@ -30,7 +30,7 @@ export class ExperiencesService {
 
     const createdLocation = new this.experienceModel({
       ...createExperienceDto,
-      authorId,
+      author,
     });
     return (await createdLocation.save()).toObject();
   }

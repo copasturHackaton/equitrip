@@ -13,8 +13,9 @@ export class Location {
   @Prop({
     type: String,
     required: true,
+    ref: 'User',
   })
-  authorId: string;
+  author: string;
 
   @Prop({
     type: String,

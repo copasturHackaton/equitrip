@@ -1,16 +1,6 @@
-import {
-  IsArray,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  MaxLength,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateTrailDto {
-  @IsNotEmpty()
-  @IsUUID()
-  private readonly authorId: string;
-
   @IsNotEmpty()
   @IsArray()
   private readonly experiences: Array<string>;

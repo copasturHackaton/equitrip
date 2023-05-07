@@ -1,6 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { Experience } from './experience.entity';
+import { enums } from 'utils';
+
+interface VotePerGroup {
+  type: 'upvote' | 'downvote';
+  gender: string;
+  race: string;
+  age: number;
+  disabilities: Array<enums.disabilities>;
+}
 
 @Schema()
 export class Trail {
@@ -13,8 +22,9 @@ export class Trail {
   @Prop({
     type: String,
     required: true,
+    ref: 'User',
   })
-  authorId: string;
+  author: string;
 
   @Prop({
     required: true,
@@ -47,6 +57,14 @@ export class Trail {
     max: 9999999999,
   })
   downVotes: number;
+
+  @Prop({
+    type: [Object],
+    required: true,
+    default: [],
+    max: 9999999999,
+  })
+  votesPerGroup: Array<VotePerGroup>;
 
   @Prop({
     type: [String],

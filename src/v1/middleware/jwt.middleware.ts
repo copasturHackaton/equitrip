@@ -23,6 +23,9 @@ export class JwtMiddleware implements NestMiddleware {
       const decoded: any = jwt.verify(token, jwtSecretKey);
 
       req['userId'] = decoded.userId;
+      req['gender'] = decoded.gender;
+      req['race'] = decoded.race;
+      req['disabilities'] = decoded.disabilities;
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
