@@ -1,15 +1,18 @@
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../database/models/user.entity';
+import { AuthService } from '../auth/auth.service';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([
       {
         name: User.name,
+        // TODO: refactor to another function
         useFactory: async () => {
           const schema = UserSchema;
 
@@ -26,6 +29,6 @@ import { User, UserSchema } from '../database/models/user.entity';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [AuthService, ConfigService, UsersService],
 })
 export class UserModule {}

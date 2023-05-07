@@ -33,6 +33,17 @@ export class UsersService {
     return foundUser.toObject();
   }
 
+  async findByEmail(email: string) {
+    const foundEmail = await this.userModel.findOne({ email }, { password: 1 });
+
+    // TODO: create custom error to return the right status code and message
+    if (!foundEmail) {
+      throw new Error('Not found');
+    }
+
+    return foundEmail.toObject();
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
