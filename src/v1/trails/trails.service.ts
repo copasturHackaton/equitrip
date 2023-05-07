@@ -95,7 +95,6 @@ export class TrailsService {
 
   async update(id: string, updateTrailDto: UpdateTrailDto) {
     await this.trailModel.updateOne({ _id: id }, updateTrailDto, { new: true });
-    return `This action updates a #${id} trail`;
   }
 
   remove(id: number) {
