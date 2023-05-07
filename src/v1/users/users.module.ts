@@ -1,11 +1,17 @@
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../database/models/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
+import { JwtMiddleware } from '../middleware/jwt.middleware';
 
 @Module({
   imports: [
@@ -31,4 +37,14 @@ import { UsersController } from './users.controller';
   controllers: [UsersController],
   providers: [AuthService, ConfigService, UsersService],
 })
-export class UserModule {}
+export class UserModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .exclude(
+        { path: 'users', method: RequestMethod.POST },
+        { path: 'users/login', method: RequestMethod.POST },
+      )
+      .forRoutes('users');
+  }
+}

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,6 +18,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
 
 @Controller('users')
 export class UsersController {
@@ -48,8 +50,9 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Req() req: LoggedInRequest, @Param('id') id: string) {
+    const { userId: loggedInUserId } = req;
+    return await this.usersService.remove(loggedInUserId, id);
   }
 
   @Post('login')
