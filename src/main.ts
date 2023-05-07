@@ -26,7 +26,7 @@ function swaggerConfig() {
 
 async function bootstrap() {
   http.get({ host: 'api.ipify.org', port: 80, path: '/' });
-  const app = await NestFactory.create(AppModule, { cors: false });
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
