@@ -8,6 +8,7 @@ import { sortOptions } from 'utils/enums';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { FindAllExperiencesResponseDto } from './dto/find-all-experiences-response.dto';
+import { NotFoundError } from '../shared/errors/NotFoundError';
 
 @Injectable()
 export class ExperiencesService {
@@ -17,21 +18,16 @@ export class ExperiencesService {
   ) {}
 
   async create(createExperienceDto: CreateExperienceDto): Promise<Experience> {
-    try {
-      const locationExists = await this.locationModel.findOne({
-        _id: createExperienceDto.getLocation(),
-      });
+    const locationExists = await this.locationModel.findOne({
+      _id: createExperienceDto.getLocation(),
+    });
 
-      // TODO: create custom error to return the right status code and message
-      if (!locationExists) {
-        throw new Error('Location not found');
-      }
-
-      const createdLocation = new this.experienceModel(createExperienceDto);
-      return (await createdLocation.save()).toObject();
-    } catch (error) {
-      console.error(error);
+    if (!locationExists) {
+      throw new NotFoundError('Location not found');
     }
+
+    const createdLocation = new this.experienceModel(createExperienceDto);
+    return (await createdLocation.save()).toObject();
   }
 
   async findAll(
@@ -63,9 +59,8 @@ export class ExperiencesService {
       .findById(id)
       .populate('location');
 
-    // TODO: create custom error to return the right status code and message
     if (!foundExperience) {
-      throw new Error('Not found');
+      throw new NotFoundError('Experience not found');
     }
 
     return foundExperience.toObject();

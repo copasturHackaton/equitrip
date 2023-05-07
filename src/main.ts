@@ -37,7 +37,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.setGlobalPrefix('/api/v1/copastur');
+  app.setGlobalPrefix('/api/v1');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   const document = SwaggerModule.createDocument(app, swaggerConfig());

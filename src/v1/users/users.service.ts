@@ -4,6 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../database/models/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { NotFoundError } from '../shared/errors/NotFoundError';
+import { ForbiddenError } from '../shared/errors/ForbiddenError';
 
 @Injectable()
 export class UsersService {
@@ -25,9 +27,8 @@ export class UsersService {
   async findOne(id: string) {
     const foundUser = await this.userModel.findById(id);
 
-    // TODO: create custom error to return the right status code and message
     if (!foundUser) {
-      throw new Error('Not found');
+      throw new NotFoundError('User not found');
     }
 
     return foundUser.toObject();
@@ -36,9 +37,8 @@ export class UsersService {
   async findByEmail(email: string) {
     const foundEmail = await this.userModel.findOne({ email }, { password: 1 });
 
-    // TODO: create custom error to return the right status code and message
     if (!foundEmail) {
-      throw new Error('Not found');
+      throw new NotFoundError('User not found');
     }
 
     return foundEmail.toObject();
@@ -50,8 +50,7 @@ export class UsersService {
 
   async remove(loggedInUserId: string, id: string) {
     if (loggedInUserId !== id) {
-      // TODO: create custom error to return the right status code and message
-      throw new Error('Unauthorized');
+      throw new ForbiddenError('You are not allowed to do that');
     }
 
     await this.userModel.deleteOne({ _id: id });

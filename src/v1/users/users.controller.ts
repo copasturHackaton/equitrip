@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import {
   Controller,
   Get,
@@ -12,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { Response } from 'express';
 
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from './users.service';
@@ -20,6 +20,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoggedInRequest } from '../shared/interfaces/loggedInRequest';
+import { NotFoundError } from '../shared/errors/NotFoundError';
+import { UnauthorizedError } from '../shared/errors/UnauthorizedError';
+import { BaseError } from '../shared/errors/BaseError';
 
 @Controller('users')
 export class UsersController {
@@ -30,9 +33,24 @@ export class UsersController {
   ) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    const { _id } = await this.usersService.create(createUserDto);
-    return { _id };
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @Res() response: Response,
+  ) {
+    try {
+      const { _id } = await this.usersService.create(createUserDto);
+      return { _id };
+    } catch (error) {
+      const { status, message } = error;
+
+      if (error instanceof BaseError) {
+        return response.status(status).send(error);
+      }
+
+      const builtError = new BaseError(message, status, error);
+
+      return response.status(builtError.getStatus()).send(builtError);
+    }
   }
 
   @Get()
@@ -41,8 +59,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  async findOne(@Param('id') id: string, @Res() response: Response) {
+    try {
+      return await this.usersService.findOne(id);
+    } catch (error) {
+      const { status, message } = error;
+
+      if (error instanceof BaseError) {
+        return response.status(status).send(error);
+      }
+
+      const builtError = new BaseError(message, status, error);
+
+      return response.status(builtError.getStatus()).send(builtError);
+    }
   }
 
   @Patch(':id')
@@ -53,13 +83,25 @@ export class UsersController {
   @Delete(':id')
   async remove(
     @Param('id') id: string,
-    @Req() req: LoggedInRequest,
-    @Res() res: Response,
+    @Req() request: LoggedInRequest,
+    @Res() response: Response,
   ) {
-    const { userId: loggedInUserId } = req;
-    await this.usersService.remove(loggedInUserId, id);
+    try {
+      const { userId: loggedInUserId } = request;
+      await this.usersService.remove(loggedInUserId, id);
 
-    return res.status(HttpStatus.NO_CONTENT).send();
+      return response.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      const { status, message } = error;
+
+      if (error instanceof BaseError) {
+        return response.status(status).send(error);
+      }
+
+      const builtError = new BaseError(message, status, error);
+
+      return response.status(builtError.getStatus()).send(builtError);
+    }
   }
 
   @Post('login')
@@ -67,51 +109,61 @@ export class UsersController {
     @Res({ passthrough: true }) response: Response,
     @Body() loginUserDto: LoginUserDto,
   ) {
-    // TODO: refactor business logic out of controller layer
-    const user = await this.usersService.findByEmail(loginUserDto.getEmail());
+    try {
+      // TODO: refactor business logic out of controller layer
+      const user = await this.usersService.findByEmail(loginUserDto.getEmail());
 
-    // TODO: create custom error to return the right status code and message
-    if (!user) {
-      throw new Error('Not found');
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+
+      const passwordsMatch = await this.authService.comparePasswords(
+        loginUserDto.getPassword(),
+        user.password,
+      );
+
+      if (!passwordsMatch) {
+        throw new UnauthorizedError('Invalid credentials');
+      }
+
+      const jwtSecretKey = this.configService.get<string>('JWT_SECRET_KEY');
+      const jwtExpiresIn = this.configService.get<string>('JWT_EXPIRES_IN');
+      const token = jwt.sign(
+        {
+          userId: user._id,
+        },
+        jwtSecretKey,
+        { expiresIn: jwtExpiresIn },
+      );
+
+      const frontEndDomain = this.configService.get<string>('FRONT_END_DOMAIN');
+      const cookieExpiresInSeconds = parseInt(
+        this.configService.get<string>('COOKIE_EXPIRES_IN_SECONDS'),
+        10,
+      );
+
+      const cookiesOpts = {
+        domain: frontEndDomain,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: cookieExpiresInSeconds,
+      };
+
+      response.cookie('token', token, cookiesOpts);
+
+      return {
+        token,
+      };
+    } catch (error) {
+      const { status, message } = error;
+
+      if (error instanceof BaseError) {
+        return response.status(status).send(error);
+      }
+
+      const builtError = new BaseError(message, status, error);
+
+      return response.status(builtError.getStatus()).send(builtError);
     }
-
-    const passwordsMatch = await this.authService.comparePasswords(
-      loginUserDto.getPassword(),
-      user.password,
-    );
-
-    // TODO: create custom error to return the right status code and message
-    if (!passwordsMatch) {
-      throw new Error('Invalid credentials');
-    }
-
-    const jwtSecretKey = this.configService.get<string>('JWT_SECRET_KEY');
-    const jwtExpiresIn = this.configService.get<string>('JWT_EXPIRES_IN');
-    const token = jwt.sign(
-      {
-        userId: user._id,
-      },
-      jwtSecretKey,
-      { expiresIn: jwtExpiresIn },
-    );
-
-    const frontEndDomain = this.configService.get<string>('FRONT_END_DOMAIN');
-    const cookieExpiresInSeconds = parseInt(
-      this.configService.get<string>('COOKIE_EXPIRES_IN_SECONDS'),
-      10,
-    );
-
-    const cookiesOpts = {
-      domain: frontEndDomain,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: cookieExpiresInSeconds,
-    };
-
-    response.cookie('token', token, cookiesOpts);
-
-    return {
-      token,
-    };
   }
 }

@@ -7,6 +7,7 @@ import { sortOptions } from 'utils/enums';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { FindAllLocationsResponseDto } from './dto/find-all-locations-response.dto';
+import { NotFoundError } from '../shared/errors/NotFoundError';
 
 @Injectable()
 export class LocationsService {
@@ -46,9 +47,8 @@ export class LocationsService {
   async findOne(id: string) {
     const foundLocation = await this.locationModel.findById(id);
 
-    // TODO: create custom error to return the right status code and message
     if (!foundLocation) {
-      throw new Error('Not found');
+      throw new NotFoundError('Location not found');
     }
 
     return foundLocation.toObject();

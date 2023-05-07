@@ -1,7 +1,9 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { UnauthorizedError } from '../shared/errors/UnauthorizedError';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
@@ -10,9 +12,8 @@ export class JwtMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const token = req.cookies.token;
 
-    // TODO: create custom error to return the right status code and message
     if (!token) {
-      throw new Error('Missing auth token');
+      throw new UnauthorizedError('No credentials provided');
     }
 
     try {
@@ -21,8 +22,7 @@ export class JwtMiddleware implements NestMiddleware {
 
       req['userId'] = decoded.userId;
     } catch (error) {
-      // TODO: create custom error to return the right status code and message
-      throw new Error('Invalid token');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
     next();
