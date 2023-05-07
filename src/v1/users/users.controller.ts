@@ -6,9 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
+import { Response } from 'express';
 
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from './users.service';
@@ -51,9 +53,14 @@ export class UsersController {
   }
 
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(
+    @Res({ passthrough: true }) response: Response,
+    @Body() loginUserDto: LoginUserDto,
+  ) {
+    // TODO: refactor business logic out of controller layer
     const user = await this.usersService.findByEmail(loginUserDto.getEmail());
 
+    // TODO: create custom error to return the right status code and message
     if (!user) {
       throw new Error('Not found');
     }
@@ -63,6 +70,7 @@ export class UsersController {
       user.password,
     );
 
+    // TODO: create custom error to return the right status code and message
     if (!passwordsMatch) {
       throw new Error('Invalid credentials');
     }
@@ -76,6 +84,21 @@ export class UsersController {
       jwtSecretKey,
       { expiresIn: jwtExpiresIn },
     );
+
+    const frontEndDomain = this.configService.get<string>('FRONT_END_DOMAIN');
+    const cookieExpiresInSeconds = parseInt(
+      this.configService.get<string>('COOKIE_EXPIRES_IN_SECONDS'),
+      10,
+    );
+
+    const cookiesOpts = {
+      domain: frontEndDomain,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: cookieExpiresInSeconds,
+    };
+
+    response.cookie('token', token, cookiesOpts);
 
     return {
       token,

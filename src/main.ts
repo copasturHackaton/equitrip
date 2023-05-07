@@ -1,9 +1,10 @@
+import { useContainer } from 'class-validator';
+import * as cookieParser from 'cookie-parser';
+import * as http from 'http';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as http from 'http';
 import { AppModule } from './app.module';
-import { useContainer } from 'class-validator';
 
 function swaggerConfig() {
   const config = new DocumentBuilder()
@@ -33,6 +34,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.use(cookieParser());
 
   app.setGlobalPrefix('/api/v1/copastur');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
